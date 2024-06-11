@@ -4,9 +4,6 @@ import { Document } from 'mongoose';
 @Schema()
 export class Lead extends Document {
   @Prop({ required: true })
-  id: string;
-
-  @Prop({ required: true })
   name: string;
 
   @Prop({ unique: true })

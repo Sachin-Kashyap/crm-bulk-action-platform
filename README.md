@@ -7,12 +7,14 @@ The Bulk Action Platform is a system designed to handle bulk operations on vario
 - [Introduction](#introduction)
 - [Features](#features)
 - [Endpoints](#endpoints)
+- [Live Version for Testing](#live-version)
 - [Setup](#setup)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Configuration](#configuration)
 - [Database and Query Design](#database-and-query-design)
 - [Queueing Service](#queueing-service)
+- [Reconcilation Strategy](#reconcilation-strategy)
 
 ## Introduction
 
@@ -32,6 +34,8 @@ The Bulk Action Platform is built using Nest.js, MongoDB, BullMQ, and Redis. It 
 - Provide uniqueness checks on email id
 - Robust error handling and input validations
 - Supports pagination on Get APIs for desired page size
+
+---
 
 ## Endpoints
 
@@ -222,6 +226,8 @@ The Bulk Action Platform is built using Nest.js, MongoDB, BullMQ, and Redis. It 
   }
   ```
 
+---
+
 ## Logger Module
 
 The Logger Module is used for logging messages, errors, and warnings in the application. It persists logs in MongoDB and provides endpoints to retrieve logs based on filters such as time range and log level.
@@ -280,6 +286,26 @@ The Logger Controller provides endpoints to retrieve logs:
     "message": "Logs deleted successfully"
   }
   ```
+
+---
+
+## Live Version
+
+- This project is [live](https://crm-bulk-action-platform.onrender.com) for demo purpose at below mentioned URL:
+
+  <https://crm-bulk-action-platform.onrender.com/>
+
+  _Please use this URL as `baseUrl` environment variable in Postman collection_
+
+- [Swagger](https://crm-bulk-action-platform.onrender.com/api) documentation can be found at this URL:
+
+  <https://crm-bulk-action-platform.onrender.com/api>
+
+- Postman collection for this project can be found in the postman directory inside the root folder of the project.
+
+`Please note`, _the project is live on a free hosted site. Because of prolonged inactivity, the hosting service may shut down the server for this program, and the URL may become unresponsive for around 1 minute or longer. Once their server spins up for this program again, we can use the URLs without any issue after that._
+
+---
 
 ## Setup
 
@@ -363,6 +389,8 @@ Replace `MONGODB_URI` and `REDIS_URL` with the connection strings for your Mongo
 
 2. Try out with some different `RATE_LIMIT_MAX_REQUESTS` or `RATE_LIMIT_TIME`.
 
+---
+
 ## Database and Query Design
 
 The Bulk Action Platform uses MongoDB as its primary database. The database schema design follows a document-based approach, with separate collections for each entity type (e.g., contacts, companies, leads). Queries are optimized for performance, leveraging indexes where necessary.
@@ -413,9 +441,6 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class Task extends Document {
-  @Prop({ required: true })
-  id: string;
-
   @Prop({ required: true })
   title: string;
 
@@ -550,6 +575,8 @@ export class ContactDto {
 
 Similar DTOs are defined for `Company`, `Lead`, `Opportunity`, and `Task`.
 
+---
+
 ## Queueing Service
 
 The Bulk Action Platform uses BullMQ as its queueing service.
@@ -558,13 +585,26 @@ BullMQ is supporting us for following functionalies in this project:
 
 - Acting as a message queue. We get bulk update request from client and after registering it in BullMQ, we instantly give response back to the user that your request is registered.
 - Helping us to follow Event Driven Architecture for bulk updates
-- For `Scheduled Jobs`, instead of creating a cron job that periodically checks for upcoming jobs to execute and wasting resources, BullMQ has facilitated us to handle scheduled jobs in much better manner, where it moves the jobs to Active list once it's delay time expires.
+- For `Scheduled Jobs`, instead of creating a cron job that periodically checks for upcoming jobs to execute and wasting resources, BullMQ has facilitated us to handle scheduled jobs in much better manner, where it moves the jobs to Active list once it's delay time expires (_server time and scheduled time - both are considered in UTC_) and at that time, it can be picked up by any available consumer process.
+
 - BullMQ helping us to priortize jobs if mutilple requests are generating from client side at the same time.
 
 For more information about BullMQ, refer to the [official documentation](https://docs.bullmq.io/).
 
 ---
 
-If there are any suggestions or concerns regarding this project or documentation, please feel free to drop me a mail on sachin.kashyap325@gmail.com
+## Reconcilation Strategy
+
+In event of server crash, if the consumer was processing the bulk action, how we are reconciling the data after the restart?
+
+- For every DB update, we're storing the result of the update in Redis Hashmap against an actionId.
+- This also helps up to figure out for which entityId, the updates were already done in that batch. So, even if the server restarts, we are able to skip updating those records again.
+- Redis is used on persistence mode, which can restore data even on failure cases from AOF backup.
+- This surely adds up the network calls to both Redis & MongoDB, because we're not doing updates in the database in Bulk (_Because we might lose the update result for individual entityId in Bulk update DB Call_), but this helps to build a robust infrastructure at backend which can handle failure cases as well.
+
+---
+
+If there are any suggestions or concerns regarding this project or documentation, please feel free to drop me a mail on
+[sachin.kashyap325@gmail.com](mailto:sachin.kashyap325@gmail.com)
 
 Thanks!

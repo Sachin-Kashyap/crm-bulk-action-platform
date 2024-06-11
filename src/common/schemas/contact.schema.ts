@@ -4,9 +4,6 @@ import { Document } from 'mongoose';
 @Schema()
 export class Contact extends Document {
   @Prop({ required: true })
-  id: string;
-
-  @Prop({ required: true })
   name: string;
 
   @Prop({ required: true, unique: true })
