@@ -324,7 +324,7 @@ Before setting up the Bulk Action Platform, ensure you have the following instal
    yarn install
    ```
 
-1. Create build & start the process
+1. Create build & start the process (After creating .env file mentioned below)
 
    ```bash
    yarn build && yarn start:prod
@@ -444,7 +444,7 @@ The project also includes schemas for `Company`, `Lead`, `Opportunity`, and `Tas
 
 ### Data Transfer Objects (DTOs)
 
-DTOs are used to define the structure of the data sent over the network.
+Below mentioned are some of the major DTOs in our system.
 
 #### CreateBulkActionDto
 
@@ -502,7 +502,7 @@ export class CreateBulkActionDto {
 }
 ```
 
-In future, if we need to add bulk update functionality for other entities as well, it will require very minimal changes to add the support for other entities too.
+In future, if we need to add bulk update functionality for other entities as well, it will require very minimal changes to add the support for other entities too. `entitiesToUpdate` field will be dynamically checked against correct DTO based on `entityType` value, we received in the payload.
 
 ### Example of DTOs for other entities:
 

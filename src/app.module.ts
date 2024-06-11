@@ -26,6 +26,7 @@ import { LoggerMiddleware } from './logger/logger.middleware';
         redis: {
           host: configService.get<string>('REDIS_HOST'),
           port: configService.get<number>('REDIS_PORT'),
+          password: configService.get<string>('REDIS_PASSWORD'),
         },
       }),
       inject: [ConfigService],
@@ -39,8 +40,8 @@ import { LoggerMiddleware } from './logger/logger.middleware';
       }),
       inject: [ConfigService],
     }),
-    LoggerModule,
     BulkActionModule,
+    LoggerModule,
   ],
 })
 export class AppModule {
