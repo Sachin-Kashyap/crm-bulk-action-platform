@@ -242,13 +242,13 @@ The Logger Controller provides endpoints to retrieve logs:
 
 - **GET /logs**: Retrieve logs based on filters (from, to, level).
   - Without filters it provide all the logs in paginated form
-- **DELETE /logs/clear**: Clear all logs.
+- **DELETE /logs**: Clear all logs.
 
 #### Detailed Request Response structure is mentioned below
 
 ### 5. API to fetch & filter logs to show on UI
 
-- **URL:** `/api/logs`
+- **URL:** `/logs`
 - **Method:** `GET`
 - **Query Parameters:** (Optional)
   - `level`: fetch desired log level [LOG, WARN, ERROR]
@@ -277,7 +277,7 @@ The Logger Controller provides endpoints to retrieve logs:
 
 ### 6. API to delete logs from Database
 
-- **URL:** `/api/logs`
+- **URL:** `/logs`
 - **Method:** `DELETE`
 - **Response:**
 
